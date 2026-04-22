@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KingFarhan MD – Pair Your Bot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #f5c518;
+    --gold-dark: #c9a007;
+    --gold-glow: rgba(245,197,24,0.18);
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #18181f;
+    --border: rgba(255,255,255,0.07);
+    --border-gold: rgba(245,197,24,0.3);
+    --text: #f0f0f5;
+    --muted: #888898;
+    --success: #22c55e;
+    --error: #ef4444;
+    --radius: 16px;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── grid bg ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(245,197,24,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,197,24,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── glow orbs ── */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb1 { width: 500px; height: 500px; background: #f5c518; top: -200px; right: -150px; }
+  .orb2 { width: 400px; height: 400px; background: #7c3aed; bottom: -150px; left: -100px; }
+
+  /* ── layout ── */
+  .page {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px 60px;
+    gap: 0;
+  }
+
+  /* ── header ── */
+  header {
+    text-align: center;
+    margin-bottom: 44px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .crown {
+    font-size: 52px;
+    display: block;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 18px var(--gold));
+    animation: pulse-crown 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse-crown {
+    0%, 100% { filter: drop-shadow(0 0 18px var(--gold)); }
+    50% { filter: drop-shadow(0 0 36px var(--gold)); }
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #f5c518 0%, #fff8d6 50%, #f5a623 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+
+  header p {
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 8px;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── main card ── */
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.7s ease 0.1s both;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* ── steps ── */
+  .steps {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .steps::after {
+    content: '';
+    position: absolute;
+    top: 16px; left: 16px; right: 16px;
+    height: 1px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+  .step.active .step-num {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #000;
+  }
+  .step.done .step-num {
+    background: var(--success);
+    border-color: var(--success);
+    color: #fff;
+  }
+  .step-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+  }
+  .step.active .step-label { color: var(--gold); }
+  .step.done .step-label { color: var(--success); }
+
+  /* ── form ── */
+  .form-group { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .phone-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .flag-select {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+    min-width: 90px;
+  }
+
+  input[type="text"], input[type="tel"] {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-size: 15px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus, input[type="tel"]:focus {
+    border-color: var(--border-gold);
+    box-shadow: 0 0 0 3px var(--gold-glow);
+  }
+  input::placeholder { color: var(--muted); }
+
+  /* ── button ── */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--gold);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: 0.3px;
+  }
+  .btn:hover { background: #f0b800; transform: translateY(-1px); box-shadow: 0 8px 24px var(--gold-glow); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    margin-top: 10px;
+  }
+  .btn-outline:hover { background: var(--bg3); border-color: var(--border-gold); box-shadow: none; }
+
+  /* ── code display ── */
+  .code-box {
+    background: var(--bg3);
+    border: 1px solid var(--border-gold);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .code-box.show { display: block; animation: fadeUp 0.4s ease both; }
+
+  .code-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .code-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 8px;
+    color: var(--gold);
+    text-shadow: 0 0 20px var(--gold-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .code-dash { color: var(--muted); font-size: 24px; }
+
+  .code-expires {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+  #expires-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  #expires-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    width: 100%;
+    transition: width 1s linear;
+  }
+
+  /* ── instructions ── */
+  .instructions {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .instructions.show { display: block; animation: fadeUp 0.4s ease 0.1s both; }
+  .instructions h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+  .instr-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 6px 0;
+  }
+  .instr-num {
+    width: 22px; height: 22px;
+    min-width: 22px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .instr-step p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .instr-step p strong { color: var(--text); }
+
+  /* ── status badge ── */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+  .status-badge.offline { background: rgba(239,68,68,0.1); color: var(--error); border: 1px solid rgba(239,68,68,0.2); }
+  .status-badge.online  { background: rgba(34,197,94,0.1); color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .status-dot.pulse { animation: dotpulse 1.5s ease-in-out infinite; }
+  @keyframes dotpulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── success screen ── */
+  #success-screen {
+    display: none;
+    text-align: center;
+    padding: 20px 0;
+    animation: fadeUp 0.5s ease both;
+  }
+  #success-screen.show { display: block; }
+  .success-icon { font-size: 64px; margin-bottom: 16px; filter: drop-shadow(0 0 20px var(--success)); }
+  #success-screen h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--success);
+    margin-bottom: 8px;
+  }
+  #success-screen p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* ── alert ── */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+    animation: fadeUp 0.3s ease both;
+  }
+  .alert.show { display: block; }
+  .alert.error { background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+  .alert.info  { background: rgba(245,197,24,0.08); color: #fde68a; border: 1px solid rgba(245,197,24,0.2); }
+
+  /* ── features strip ── */
+  .features {
+    width: 100%;
+    max-width: 480px;
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    animation: fadeUp 0.7s ease 0.3s both;
+  }
+  .feature {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .feature-icon { font-size: 22px; margin-bottom: 6px; }
+  .feature h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .feature p { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* ── footer ── */
+  footer {
+    margin-top: 36px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    animation: fadeUp 0.7s ease 0.4s both;
+  }
+  footer span { color: var(--gold); }
+
+  /* ── animations ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 24px 20px; }
+    .features { grid-template-columns: 1fr 1fr; }
+    .code-value { font-size: 28px; letter-spacing: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="page">
+
+  <header>
+    <span class="crown">👑</span>
+    <h1>KingFarhan MD</h1>
+    <p>WhatsApp Multi-Device Bot &mdash; Pair in seconds</p>
+  </header>
+
+  <div class="card">
+
+    <!-- status -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div id="status-badge" class="status-badge offline">
+        <div class="status-dot pulse"></div>
+        <span id="status-text">Connecting…</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);">v1.0.0</div>
+    </div>
+
+    <!-- steps -->
+    <div class="steps">
+      <div class="step active" id="step1">
+        <div class="step-num">1</div>
+        <div class="step-label">Enter</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-num">2</div>
+        <div class="step-label">Code</div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-num">3</div>
+        <div class="step-label">Paired</div>
+      </div>
+    </div>
+
+    <!-- alert -->
+    <div class="alert" id="alert"></div>
+
+    <!-- ── SCREEN 1: phone input ── -->
+    <div id="screen-phone">
+      <div class="form-group">
+        <label>WhatsApp phone number</label>
+        <div class="phone-row">
+          <div class="flag-select">🇰🇪 +254</div>
+          <input type="tel" id="phone-input"
+                 placeholder="712 345 678"
+                 maxlength="15"
+                 autocomplete="tel" />
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;">
+          Enter your number with country code — e.g. 254712345678
+        </p>
+      </div>
+      <button class="btn" id="get-code-btn" onclick="requestCode()">
+        ⚡ Generate Pairing Code
+      </button>
+    </div>
+
+    <!-- ── SCREEN 2: code + instructions ── -->
+    <div id="screen-code" style="display:none;">
+      <div class="code-box show">
+        <div class="code-label">Your Pairing Code</div>
+        <div class="code-value">
+          <span id="code-p1">????</span>
+          <span class="code-dash">—</span>
+          <span id="code-p2">????</span>
+        </div>
+        <div class="code-expires">Expires in <strong id="expire-secs">60</strong>s</div>
+        <div id="expires-bar"><div id="expires-fill"></div></div>
+      </div>
+
+      <div class="instructions show">
+        <h3>📱 How to link</h3>
+        <div class="instr-step">
+          <div class="instr-num">1</div>
+          <p>Open <strong>WhatsApp</strong> on your phone</p>
+        </div>
+        <div class="instr-step">
+          <div class="instr-num">2</div>
+          <p>Go to <strong>Linked Devices</strong> (tap ⋮ → Linked devices)</p>
+        </div>
+        <div class="instr-step">
+          <div class="instr-num">3</div>
+          <p>Tap <strong>"Link a Device"</strong></p>
+        </div>
+        <div class="instr-step">
+          <div class="instr-num">4</div>
+          <p>Tap <strong>"Link with phone number instead"</strong></p>
+        </div>
+        <div class="instr-step">
+          <div class="instr-num">5</div>
+          <p>Enter the <strong>8-digit code</strong> shown above</p>
+        </div>
+      </div>
+
+      <button class="btn btn-outline" onclick="resetToPhone()">← Back / Try Again</button>
+    </div>
+
+    <!-- ── SCREEN 3: success ── -->
+    <div id="success-screen">
+      <div class="success-icon">✅</div>
+      <h2>Paired Successfully!</h2>
+      <p>KingFarhan MD is now connected to your WhatsApp.<br/>
+         Type <strong style="color:var(--gold)">.menu</strong> in any chat to get started.</p>
+      <br/>
+      <button class="btn" onclick="location.reload()">↩ Pair Another Device</button>
+    </div>
+
+  </div><!-- /.card -->
+
+  <!-- features -->
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">🤖</div>
+      <h4>AI Powered</h4>
+      <p>Ask anything with .ai</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">👥</div>
+      <h4>Group Tools</h4>
+      <p>Kick, tag, mute &amp; more</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <h4>40+ Commands</h4>
+      <p>Fun, tools &amp; media</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <h4>Owner Only</h4>
+      <p>Protected admin cmds</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🌍</div>
+      <h4>Translate</h4>
+      <p>100+ languages</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">👑</div>
+      <h4>KingFarhan</h4>
+      <p>Built by the king</p>
+    </div>
+  </div>
+
+  <footer>
+    Made with ❤️ by <span>KingFarhan</span> &mdash; KingFarhan MD &copy; 2025
+  </footer>
+
+</div><!-- /.page -->
+
+<script>
+  let expireTimer = null;
+  let statusInterval = null;
+  let secs = 60;
+
+  // ── poll bot status ─────────────────────────────────────────────────────────
+  async function checkStatus() {
+    try {
+      const r = await fetch('/api/status');
+      const d = await r.json();
+      const badge = document.getElementById('status-badge');
+      const txt   = document.getElementById('status-text');
+
+      if (d.paired) {
+        badge.className = 'status-badge online';
+        txt.textContent = 'Bot Online';
+        badge.querySelector('.status-dot').classList.remove('pulse');
+        showSuccess();
+      } else {
+        badge.className = 'status-badge offline';
+        txt.textContent = 'Not Paired';
+      }
+    } catch {
+      document.getElementById('status-text').textContent = 'Bot Offline';
+    }
+  }
+
+  statusInterval = setInterval(checkStatus, 3000);
+  checkStatus();
+
+  // ── request pairing code ─────────────────────────────────────────────────────
+  async function requestCode() {
+    const raw   = document.getElementById('phone-input').value.trim();
+    const phone = raw.replace(/[^0-9]/g, '');
+
+    if (phone.length < 10) {
+      showAlert('Please enter a valid phone number with country code.', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('get-code-btn');
+    btn.disabled = true;
+    btn.textContent = 'Requesting…';
+    hideAlert();
+
+    try {
+      const res = await fetch('/api/pair', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        showAlert(data.error || 'Failed to generate code. Is the bot running?', 'error');
+        btn.disabled = false;
+        btn.textContent = '⚡ Generate Pairing Code';
+        return;
+      }
+
+      showCodeScreen(data.code);
+    } catch (e) {
+      showAlert('Cannot reach the bot server. Make sure index.js is running.', 'error');
+      btn.disabled = false;
+      btn.textContent = '⚡ Generate Pairing Code';
+    }
+  }
+
+  // ── show code screen ─────────────────────────────────────────────────────────
+  function showCodeScreen(code) {
+    document.getElementById('screen-phone').style.display = 'none';
+    document.getElementById('screen-code').style.display  = 'block';
+
+    // split 8-char code into two groups of 4
+    const clean = (code || '').replace(/[^A-Z0-9]/gi, '').toUpperCase();
+    document.getElementById('code-p1').textContent = clean.slice(0, 4) || '????';
+    document.getElementById('code-p2').textContent = clean.slice(4, 8) || '????';
+
+    setStep(2);
+    startExpireCountdown();
+    startPollingForPair();
+  }
+
+  // ── expire countdown ─────────────────────────────────────────────────────────
+  function startExpireCountdown() {
+    secs = 60;
+    clearInterval(expireTimer);
+    document.getElementById('expires-fill').style.width = '100%';
+    expireTimer = setInterval(() => {
+      secs--;
+      document.getElementById('expire-secs').textContent = secs;
+      document.getElementById('expires-fill').style.width = (secs / 60 * 100) + '%';
+      if (secs <= 0) {
+        clearInterval(expireTimer);
+        showAlert('Code expired. Please request a new one.', 'info');
+      }
+    }, 1000);
+  }
+
+  // ── poll for successful pair ─────────────────────────────────────────────────
+  function startPollingForPair() {
+    const poll = setInterval(async () => {
+      try {
+        const r = await fetch('/api/status');
+        const d = await r.json();
+        if (d.paired) {
+          clearInterval(poll);
+          clearInterval(expireTimer);
+          showSuccess();
+        }
+      } catch {}
+    }, 2000);
+    // stop polling after 2 min
+    setTimeout(() => clearInterval(poll), 120000);
+  }
+
+  // ── show success screen ──────────────────────────────────────────────────────
+  function showSuccess() {
+    document.getElementById('screen-phone').style.display = 'none';
+    document.getElementById('screen-code').style.display  = 'none';
+    document.getElementById('success-screen').className   = 'show';
+    setStep(3);
+  }
+
+  // ── reset ────────────────────────────────────────────────────────────────────
+  function resetToPhone() {
+    clearInterval(expireTimer);
+    document.getElementById('screen-code').style.display  = 'none';
+    document.getElementById('screen-phone').style.display = 'block';
+    const btn = document.getElementById('get-code-btn');
+    btn.disabled = false;
+    btn.textContent = '⚡ Generate Pairing Code';
+    setStep(1);
+    hideAlert();
+  }
+
+  // ── step indicator ───────────────────────────────────────────────────────────
+  function setStep(n) {
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById('step' + i);
+      el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    }
+  }
+
+  // ── alert helpers ─────────────────────────────────────────────────────────────
+  function showAlert(msg, type = 'error') {
+    const el = document.getElementById('alert');
+    el.textContent = msg;
+    el.className = 'alert show ' + type;
+  }
+  function hideAlert() {
+    document.getElementById('alert').className = 'alert';
+  }
+
+  // ── phone input: allow Enter ──────────────────────────────────────────────────
+  document.getElementById('phone-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') requestCode();
+  });
+</script>
+</body>
+</html>
